@@ -68,30 +68,11 @@
 }
 
 - (BOOL)isRequestFetchEquivalent:(DFImageRequest *)request1 toRequest:(DFImageRequest *)request2 {
-    if (![self isRequestCacheEquivalent:request1 toRequest:request2]) {
-        return NO;
-    }
-    DFURLImageRequestOptions *options1 = (id)request1.options;
-    DFURLImageRequestOptions *options2 = (id)request2.options;
-    return (options1.allowsNetworkAccess == options2.allowsNetworkAccess &&
-            options1.cachePolicy == options2.cachePolicy);
+    return [self isRequestCacheEquivalent:request1 toRequest:request2];
 }
 
 - (BOOL)isRequestCacheEquivalent:(DFImageRequest *)request1 toRequest:(DFImageRequest *)request2 {
-    if (request1 == request2) {
-        return YES;
-    }
-    NSURL *URL1 = (NSURL *)request1.resource;
-    NSURL *URL2 = (NSURL *)request2.resource;
-    return [URL1 isEqual:URL2];
-}
-
-- (DFImageRequest *)canonicalRequestForRequest:(DFImageRequest *)request {
-    if (!request.options || ![request.options isKindOfClass:[DFURLImageRequestOptions class]]) {
-        DFURLImageRequestOptions *options = [[DFURLImageRequestOptions alloc] initWithOptions:request.options];
-        request.options = options;
-    }
-    return request;
+    return [request1.resource isEqual:request2.resource];
 }
 
 - (NSOperation *)startOperationWithRequest:(DFImageRequest *)request progressHandler:(void (^)(double))progressHandler completion:(void (^)(DFImageResponse *))completion {
