@@ -137,16 +137,9 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 - (DFURLSessionOperation *)_createOperationForImageRequest:(DFImageRequest *)imageRequest {
     NSURL *URL = (NSURL *)imageRequest.resource;
     NSURLRequest *URLRequest = [NSURLRequest requestWithURL:URL];
-    DFURLSessionOperation *operation = [self _operationForImageRequest:imageRequest URLRequest:URLRequest];
+    DFURLSessionOperation *operation = [[DFURLSessionOperation alloc] initWithRequest:URLRequest];
     operation.deserializer = [self _responseDeserializerForImageRequest:imageRequest URLRequest:URLRequest];
     return operation;
-}
-
-- (DFURLSessionOperation *)_operationForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest {
-    if ([self.delegate respondsToSelector:@selector(URLImageFetcher:operationForImageRequest:URLRequest:)]) {
-        return [self.delegate URLImageFetcher:self operationForImageRequest:imageRequest URLRequest:URLRequest];
-    }
-    return [[DFURLSessionOperation alloc] initWithRequest:URLRequest];
 }
 
 - (id<DFURLResponseDeserializing>)_responseDeserializerForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest {
