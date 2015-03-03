@@ -41,7 +41,7 @@
         if (self.isCancelled) {
             [self finish];
         } else {
-            _task = [self.delegate URLSessionOperation:self dataTaskWithRequest:self.request];
+            _task = [[NSURLSession sharedSession] dataTaskWithRequest:self.request];
             [_task resume];
         }
     }

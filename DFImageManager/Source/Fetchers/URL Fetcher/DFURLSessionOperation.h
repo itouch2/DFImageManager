@@ -25,16 +25,8 @@
 
 @class DFURLSessionOperation;
 
-@protocol DFURLSessionOperationDelegate <NSObject>
-
-- (NSURLSessionDataTask *)URLSessionOperation:(DFURLSessionOperation *)operation dataTaskWithRequest:(NSURLRequest *)request;
-
-@end
-
-
 @interface DFURLSessionOperation : DFOperation
 
-@property (nonatomic) id<DFURLSessionOperationDelegate> delegate;
 @property (nonatomic, readonly) NSURLRequest *request;
 
 - (instancetype)initWithRequest:(NSURLRequest *)request NS_DESIGNATED_INITIALIZER;

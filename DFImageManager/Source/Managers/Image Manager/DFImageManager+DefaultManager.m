@@ -41,13 +41,8 @@
     
     DFImageManager *URLImageManager = ({
         // Initialize NSURLCache without memory cache because DFImageManager has a dedicated memory cache for processed images (see DFImageCaching protocol).
-        NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:0 diskCapacity:1024 * 1024 * 256 diskPath:@"com.github.kean.default_image_cache"];
-        
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        // See https://github.com/kean/DFImageManager/wiki/Image-Caching-Guide for more info on image caching and NSURLCache
-        configuration.URLCache = URLCache;
             
-        DFURLImageFetcher *fetcher = [[DFURLImageFetcher alloc] initWithSessionConfiguration:configuration];
+        DFURLImageFetcher *fetcher = [[DFURLImageFetcher alloc] init];
         [[DFImageManager alloc] initWithConfiguration:[DFImageManagerConfiguration configurationWithFetcher:fetcher processor:processor cache:cache]];
     });
     

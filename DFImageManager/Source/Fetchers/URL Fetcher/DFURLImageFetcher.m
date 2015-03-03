@@ -25,18 +25,12 @@
 #import "DFURLImageFetcher.h"
 #import "DFURLSessionOperation.h"
 
-@interface DFURLImageFetcher () <DFURLSessionOperationDelegate>
-
-@end
-
 @implementation DFURLImageFetcher {
     NSOperationQueue *_queue;
 }
 
-- (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration {
+- (instancetype)init {
     if (self = [super init]) {
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
-        _session = session;
         _queue = [NSOperationQueue new];
         _supportedSchemes = [NSSet setWithObjects:@"http", @"https", @"ftp", @"file", @"data", nil];
     }
@@ -65,22 +59,8 @@
 - (NSOperation *)startOperationWithRequest:(DFImageRequest *)request progressHandler:(void (^)(double))progressHandler completion:(void (^)(DFImageResponse *))completion {
     NSURLRequest *URLRequest = [NSURLRequest requestWithURL:(NSURL *)request.resource];
     DFURLSessionOperation *operation = [[DFURLSessionOperation alloc] initWithRequest:URLRequest];
-    operation.delegate = self;
     [_queue addOperation:operation];
     return operation;
-}
-
-#pragma mark - <NSURLSessionDataTaskDelegate>
-
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    // Do nothing
-}
-
-#pragma mark - <DFURLSessionOperationDelegate>
-
-- (NSURLSessionDataTask *)URLSessionOperation:(DFURLSessionOperation *)operation dataTaskWithRequest:(NSURLRequest *)request {
-    NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request];
-    return task;
 }
 
 @end

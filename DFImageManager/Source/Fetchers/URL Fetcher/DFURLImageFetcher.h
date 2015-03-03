@@ -23,11 +23,8 @@
 #import "DFImageFetching.h"
 #import <Foundation/Foundation.h>
 
-@interface DFURLImageFetcher : NSObject <DFImageFetching, NSURLSessionDataDelegate>
+@interface DFURLImageFetcher : NSObject <DFImageFetching>
 
-@property (nonatomic, readonly) NSURLSession *session;
 @property (nonatomic) NSSet *supportedSchemes;
-
-- (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration;
 
 @end
