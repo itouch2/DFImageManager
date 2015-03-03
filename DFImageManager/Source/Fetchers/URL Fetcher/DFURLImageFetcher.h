@@ -70,7 +70,7 @@ extern NSString *const DFImageInfoURLResponseKey;
  @note Uses NSURLSession with a custom delegate. For more info on NSURLSession life cycle with custom delegates see the "URL Loading System Programming Guide" from Apple.
  @note Supported URL schemes: http, https, ftp, file and data
  */
-@interface DFURLImageFetcher : NSObject <DFImageFetching, NSURLSessionDelegate, NSURLSessionDataDelegate, DFURLImageFetcherSessionDelegate>
+@interface DFURLImageFetcher : NSObject <DFImageFetching, NSURLSessionDataDelegate, DFURLImageFetcherSessionDelegate>
 
 /*! The NSURLSession instance used by the image fetcher.
  */

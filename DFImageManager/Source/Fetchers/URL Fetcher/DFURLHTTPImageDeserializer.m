@@ -42,8 +42,7 @@
 }
 
 - (BOOL)isValidResponse:(NSHTTPURLResponse *)response error:(NSError *__autoreleasing *)error {
-    NSParameterAssert(response);
-    NSAssert([response isKindOfClass:[NSHTTPURLResponse class]], @"Invalid response");
+    return YES;
     if (self.acceptableStatusCodes != nil && ![self.acceptableStatusCodes containsIndex:(NSUInteger)response.statusCode]) {
         if (error != nil) {
             NSDictionary *userInfo = [self _errorInfoWithResponse:response];

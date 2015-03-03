@@ -25,7 +25,7 @@
 
 
 @implementation DFURLSessionOperation {
-    NSURLSessionDataTask *_task;
+    NSURLSessionDataTask *__weak _task;
 }
 
 - (instancetype)initWithRequest:(NSURLRequest *)request {
@@ -101,17 +101,20 @@
     @synchronized(self) {
         if (!self.isCancelled) {
             [super cancel];
+
             [_task cancel];
         }
     }
 }
 
+/*
 - (void)setQueuePriority:(NSOperationQueuePriority)queuePriority {
     [super setQueuePriority:queuePriority];
     if ([_task respondsToSelector:@selector(setPriority:)]) {
         _task.priority = [DFURLSessionOperation _taskPriorityForQueuePriority:queuePriority];
     }
 }
+*/
 
 + (float)_taskPriorityForQueuePriority:(NSOperationQueuePriority)queuePriority {
     switch (queuePriority) {

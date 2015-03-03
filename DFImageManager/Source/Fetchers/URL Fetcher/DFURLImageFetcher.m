@@ -73,6 +73,7 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
         _session = session;
         _sessionDelegate = sessionDelegate;
         _sessionTaskHandlers = [NSMutableDictionary new];
+        _sessionTaskHandlers = nil;
         
         // We don't need to limit concurrent operations for NSURLSession. For more info see https://github.com/kean/DFImageManager/wiki/Image-Caching-Guide
         _queue = [NSOperationQueue new];
@@ -121,7 +122,7 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 - (DFImageRequest *)canonicalRequestForRequest:(DFImageRequest *)request {
     if (!request.options || ![request.options isKindOfClass:[DFURLImageRequestOptions class]]) {
         DFURLImageRequestOptions *options = [[DFURLImageRequestOptions alloc] initWithOptions:request.options];
-        options.cachePolicy = self.session.configuration.requestCachePolicy;
+ //       options.cachePolicy = self.session.configuration.requestCachePolicy;
         request.options = options;
     }
     return request;
@@ -176,16 +177,18 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
      Apple doesn't not provide a complete documentation on what NSURLSessionConfiguration options can be overridden by NSURLRequest and in when. So it's best to copy all the options, because the NSURLSession implementation might change in future versons.
      */
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:URL];
-    [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
+//    [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
     
     /* Set options that can not be configured by DFURLImageRequestOptions.
      */
-    NSURLSessionConfiguration *conf = self.session.configuration;
+    /*
+   NSURLSessionConfiguration *conf = self.session.configuration;
     request.timeoutInterval = conf.timeoutIntervalForRequest;
     request.networkServiceType = conf.networkServiceType;
     request.allowsCellularAccess = conf.allowsCellularAccess;
     request.HTTPShouldHandleCookies = conf.HTTPShouldSetCookies;
     request.HTTPShouldUsePipelining = conf.HTTPShouldUsePipelining;
+     */
     
     /* Set options that can be configured by DFURLImageRequestOptions.
      */
@@ -221,7 +224,7 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
     @synchronized(self) {
         _DFURLSessionDataTaskHandler *handler = _sessionTaskHandlers[dataTask];
         if (handler.progressHandler) {
-            handler.progressHandler(dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive);
+        //    handler.progressHandler(dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive);
         }
         [handler.data appendData:data];
     }
@@ -231,10 +234,14 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
     @synchronized(self) {
         _DFURLSessionDataTaskHandler *handler = _sessionTaskHandlers[task];
         if (handler.completionHandler) {
-            handler.completionHandler(handler.data, task.response, error);
+            handler.completionHandler(handler.data, nil, error);
         }
         [_sessionTaskHandlers removeObjectForKey:task];
     }
+}
+
+- (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error {
+    NSLog(@"error");
 }
 
 #pragma mark - <DFURLSessionOperationDelegate>
@@ -247,8 +254,11 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 
 - (NSURLSessionDataTask *)URLImageFetcher:(DFURLImageFetcher *)fetcher dataTaskWithRequest:(NSURLRequest *)request progressHandler:(DFURLSessionProgressHandler)progressHandler completionHandler:(DFURLSessionCompletionHandler)completionHandler {
     NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request];
-    if (task) {
-        @synchronized(self) {
+    return task;
+    
+    @synchronized(self) {
+            task = [self.session dataTaskWithRequest:request];
+            if (task) {
             _sessionTaskHandlers[task] = [[_DFURLSessionDataTaskHandler alloc] initWithProgressHandler:progressHandler completion:completionHandler];
         }
     }
