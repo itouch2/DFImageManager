@@ -41,14 +41,10 @@
         if (self.isCancelled) {
             [self finish];
         } else {
-            [self _startDataTask];
+            _task = [self.delegate URLSessionOperation:self dataTaskWithRequest:self.request];
+            [_task resume];
         }
     }
-}
-
-- (void)_startDataTask {
-    _task = [self.delegate URLSessionOperation:self dataTaskWithRequest:self.request];
-    [_task resume];
 }
 
 - (void)finish {
