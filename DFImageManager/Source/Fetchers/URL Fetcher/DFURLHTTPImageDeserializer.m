@@ -42,7 +42,6 @@
 }
 
 - (BOOL)isValidResponse:(NSHTTPURLResponse *)response error:(NSError *__autoreleasing *)error {
-    return YES;
     if (self.acceptableStatusCodes != nil && ![self.acceptableStatusCodes containsIndex:(NSUInteger)response.statusCode]) {
         if (error != nil) {
             NSDictionary *userInfo = [self _errorInfoWithResponse:response];

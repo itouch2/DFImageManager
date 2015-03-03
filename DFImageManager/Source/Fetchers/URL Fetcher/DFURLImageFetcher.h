@@ -24,37 +24,6 @@
 #import "DFImageFetching.h"
 #import <Foundation/Foundation.h>
 
-@class DFURLImageFetcher;
-
-
-/*! A URL response received by the URL loading system (NSURLRequest). Clients may use it to retrieve HTTP status code and other metadata associated with a URL load.
- */
-extern NSString *const DFImageInfoURLResponseKey;
-
-/*! The DFURLImageFetcherDelegate protocol describes the methods that DFURLImageFetcher objects call on their delegates to customize its behavior.
- */
-@protocol DFURLImageFetcherDelegate <NSObject>
-
-@optional
-
-/*! Sent before the DFURLImageFetcher creates a DFURLSessionOperation for load.
- @param fetcher The image fetcher sending the message.
- @param imageRequest The image request.
- @param URLRequest The proposed URL request to used for image load.
- @return The delegate may return modified, unmodified NSURLResponse or create NSURLResponse from scratch.
- */
-- (NSURLRequest *)URLImageFetcher:(DFURLImageFetcher *)fetcher URLRequestForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest;
-
-/*! Creates operation for a given request.
- */
-- (DFURLSessionOperation *)URLImageFetcher:(DFURLImageFetcher *)fetcher operationForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest;
-
-/*! Creates response deserializer for a given request.
- */
-- (id<DFURLResponseDeserializing>)URLImageFetcher:(DFURLImageFetcher *)fetcher responseDeserializerForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest;
-
-@end
-
 
 /*! The DFURLImageFetcher implements DFImageFetching protocol to provide a functionality of fetching images using Cocoa URL Loading System.
  @note Uses NSURLSession with a custom delegate. For more info on NSURLSession life cycle with custom delegates see the "URL Loading System Programming Guide" from Apple.
@@ -70,10 +39,6 @@ extern NSString *const DFImageInfoURLResponseKey;
  @note The property can be changed in case there are any custom protocols supported by NSURLSession.
  */
 @property (nonatomic) NSSet *supportedSchemes;
-
-/*! The delegate of the receiver.
- */
-@property (nonatomic, weak) id<DFURLImageFetcherDelegate> delegate;
 
 /*! Initializes the DFURLImageFetcher with a given session configuration. The DFURLImageFetcher sets itself as a NSURLSessionDelegate and DFURLImageFetcherSessionDelegate.
  */

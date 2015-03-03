@@ -30,32 +30,6 @@
 #import "DFURLResponseDeserializing.h"
 #import "DFURLSessionOperation.h"
 
-NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
-
-
-@interface _DFURLSessionDataTaskHandler : NSObject
-
-@property (nonatomic, copy, readonly) DFURLSessionProgressHandler progressHandler;
-@property (nonatomic, copy, readonly) DFURLSessionCompletionHandler completionHandler;
-@property (nonatomic, readonly) NSMutableData *data;
-
-- (instancetype)initWithProgressHandler:(DFURLSessionProgressHandler)progressHandler completion:(DFURLSessionCompletionHandler)completion;
-
-@end
-
-@implementation _DFURLSessionDataTaskHandler
-
-- (instancetype)initWithProgressHandler:(DFURLSessionProgressHandler)progressHandler completion:(DFURLSessionCompletionHandler)completionHandler {
-    if (self = [super init]) {
-        _progressHandler = [progressHandler copy];
-        _completionHandler = [completionHandler copy];
-        _data = [NSMutableData new];
-    }
-    return self;
-}
-
-@end
-
 
 @interface DFURLImageFetcher () <DFURLSessionOperationDelegate>
 
@@ -66,10 +40,8 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 }
 
 - (instancetype)initWithSession:(NSURLSession *)session {
-    NSParameterAssert(session);
     if (self = [super init]) {
         _session = session;
-        
         // We don't need to limit concurrent operations for NSURLSession. For more info see https://github.com/kean/DFImageManager/wiki/Image-Caching-Guide
         _queue = [NSOperationQueue new];
         
