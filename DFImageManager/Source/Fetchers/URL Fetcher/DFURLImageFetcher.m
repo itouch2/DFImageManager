@@ -22,10 +22,8 @@
 
 #import "DFImageRequest.h"
 #import "DFImageRequestOptions.h"
-#import "DFImageResponse.h"
 #import "DFURLImageFetcher.h"
 #import "DFURLSessionOperation.h"
-
 
 @interface DFURLImageFetcher () <DFURLSessionOperationDelegate>
 
@@ -35,19 +33,14 @@
     NSOperationQueue *_queue;
 }
 
-- (instancetype)initWithSession:(NSURLSession *)session {
+- (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration {
     if (self = [super init]) {
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
         _session = session;
-        // We don't need to limit concurrent operations for NSURLSession. For more info see https://github.com/kean/DFImageManager/wiki/Image-Caching-Guide
         _queue = [NSOperationQueue new];
         _supportedSchemes = [NSSet setWithObjects:@"http", @"https", @"ftp", @"file", @"data", nil];
     }
     return self;
-}
-
-- (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration {
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
-    return [self initWithSession:session];
 }
 
 #pragma mark - <DFImageFetching>
@@ -70,8 +63,7 @@
 }
 
 - (NSOperation *)startOperationWithRequest:(DFImageRequest *)request progressHandler:(void (^)(double))progressHandler completion:(void (^)(DFImageResponse *))completion {
-    NSURL *URL = (NSURL *)request.resource;
-    NSURLRequest *URLRequest = [NSURLRequest requestWithURL:URL];
+    NSURLRequest *URLRequest = [NSURLRequest requestWithURL:(NSURL *)request.resource];
     DFURLSessionOperation *operation = [[DFURLSessionOperation alloc] initWithRequest:URLRequest];
     operation.delegate = self;
     [_queue addOperation:operation];
@@ -86,7 +78,7 @@
 
 #pragma mark - <DFURLSessionOperationDelegate>
 
-- (NSURLSessionDataTask *)URLSessionOperation:(DFURLSessionOperation *)operation dataTaskWithRequest:(NSURLRequest *)request progressHandler:(DFURLSessionProgressHandler)progressHandler completionHandler:(DFURLSessionCompletionHandler)completionHandler {
+- (NSURLSessionDataTask *)URLSessionOperation:(DFURLSessionOperation *)operation dataTaskWithRequest:(NSURLRequest *)request {
     NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request];
     return task;
 }

@@ -20,9 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "DFURLResponseDeserializing.h"
 #import "DFURLSessionOperation.h"
-
 
 @implementation DFURLSessionOperation {
     NSURLSessionDataTask *__weak _task;
@@ -49,46 +47,8 @@
 }
 
 - (void)_startDataTask {
-    DFURLSessionOperation *__weak weakSelf = self;
-    _task = [self.delegate URLSessionOperation:self dataTaskWithRequest:self.request progressHandler:^(int64_t countOfBytesReceived, int64_t countOfBytesExpectedToReceive) {
-        [weakSelf _didUpdateProgressWithCountOfBytesReceived:countOfBytesReceived countOfBytesExpectedToReceive:countOfBytesExpectedToReceive];
-    } completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        [weakSelf _didFinishWithData:data response:response error:error];
-    }];
-    if (_task != nil) {
-        [_task resume];
-    } else {
-        [self finish];
-    }
-}
-
-- (void)_didUpdateProgressWithCountOfBytesReceived:(int64_t) countOfBytesReceived countOfBytesExpectedToReceive:(int64_t)countOfBytesExpectedToReceive {
-    if (self.progressHandler) {
-        self.progressHandler(countOfBytesReceived, countOfBytesExpectedToReceive);
-    }
-}
-
-- (void)_didFinishWithData:(NSData *)data response:(NSURLResponse *)response error:(NSError *)error {
-    _data = data;
-    _response = response;
-    _error = error;
-    
-    if (error != nil || self.isCancelled) {
-        [self finish];
-    } else {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            @autoreleasepool {
-                [self _deserializeResponse];
-            }
-        });
-    }
-}
-
-- (void)_deserializeResponse {
-    NSError *error;
-    _responseObject = [_deserializer objectFromResponse:_response data:_data error:&error];
-    _error = error;
-    [self finish];
+    _task = [self.delegate URLSessionOperation:self dataTaskWithRequest:self.request];
+    [_task resume];
 }
 
 - (void)finish {
@@ -101,38 +61,9 @@
     @synchronized(self) {
         if (!self.isCancelled) {
             [super cancel];
-
             [_task cancel];
         }
     }
-}
-
-/*
-- (void)setQueuePriority:(NSOperationQueuePriority)queuePriority {
-    [super setQueuePriority:queuePriority];
-    if ([_task respondsToSelector:@selector(setPriority:)]) {
-        _task.priority = [DFURLSessionOperation _taskPriorityForQueuePriority:queuePriority];
-    }
-}
-*/
-
-+ (float)_taskPriorityForQueuePriority:(NSOperationQueuePriority)queuePriority {
-    switch (queuePriority) {
-        case NSOperationQueuePriorityVeryHigh: return 0.9f;
-        case NSOperationQueuePriorityHigh: return 0.7f;
-        case NSOperationQueuePriorityNormal: return 0.5f;
-        case NSOperationQueuePriorityLow: return 0.3f;
-        case NSOperationQueuePriorityVeryLow: return 0.1f;
-    }
-}
-
-@end
-
-
-@implementation DFURLSessionOperation (HTTP)
-
-- (NSHTTPURLResponse *)HTTPResponse {
-    return [self.response isKindOfClass:[NSHTTPURLResponse class]] ? (id)self.response : nil;
 }
 
 @end

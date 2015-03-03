@@ -20,34 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "DFURLSessionOperation.h"
 #import "DFImageFetching.h"
 #import <Foundation/Foundation.h>
 
-
-/*! The DFURLImageFetcher implements DFImageFetching protocol to provide a functionality of fetching images using Cocoa URL Loading System.
- @note Uses NSURLSession with a custom delegate. For more info on NSURLSession life cycle with custom delegates see the "URL Loading System Programming Guide" from Apple.
- @note Supported URL schemes: http, https, ftp, file and data
- */
 @interface DFURLImageFetcher : NSObject <DFImageFetching, NSURLSessionDataDelegate>
 
-/*! The NSURLSession instance used by the image fetcher.
- */
 @property (nonatomic, readonly) NSURLSession *session;
-
-/*! A set containing all the supported URL schemes. The default set contains "http", "https", "ftp", "file" and "data" schemes.
- @note The property can be changed in case there are any custom protocols supported by NSURLSession.
- */
 @property (nonatomic) NSSet *supportedSchemes;
 
-/*! Initializes the DFURLImageFetcher with a given session configuration. The DFURLImageFetcher sets itself as a NSURLSessionDelegate and DFURLImageFetcherSessionDelegate.
- */
 - (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration;
-
-/*! Initializes the DFURLImageFetcher with a given session and sessionDelegate.
- @param session The NSURLSession instance that is used with a custom delegate. For more info on NSURLSession life cycle with custom delegates see the "URL Loading System Programming Guide" from Apple.
- @param sessionDelegate Apart from implementing NSURLSessionDataDelegate protocol your classes should also provide a DFURLImageFetcherSessionDelegate implementation.
- */
-- (instancetype)initWithSession:(NSURLSession *)session;
 
 @end
