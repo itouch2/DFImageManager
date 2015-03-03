@@ -63,17 +63,12 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 
 @implementation DFURLImageFetcher {
     NSOperationQueue *_queue;
-    NSMutableDictionary *_sessionTaskHandlers;
 }
 
-- (instancetype)initWithSession:(NSURLSession *)session sessionDelegate:(id<DFURLImageFetcherSessionDelegate>)sessionDelegate {
+- (instancetype)initWithSession:(NSURLSession *)session {
     NSParameterAssert(session);
-    NSParameterAssert(sessionDelegate);
     if (self = [super init]) {
         _session = session;
-        _sessionDelegate = sessionDelegate;
-        _sessionTaskHandlers = [NSMutableDictionary new];
-        _sessionTaskHandlers = nil;
         
         // We don't need to limit concurrent operations for NSURLSession. For more info see https://github.com/kean/DFImageManager/wiki/Image-Caching-Guide
         _queue = [NSOperationQueue new];
@@ -86,7 +81,7 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 - (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration {
     NSParameterAssert(configuration);
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
-    return [self initWithSession:session sessionDelegate:self];
+    return [self initWithSession:session];
 }
 
 #pragma mark - <DFImageFetching>
@@ -137,27 +132,10 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 - (DFURLSessionOperation *)_createOperationForImageRequest:(DFImageRequest *)imageRequest {
     NSURL *URL = (NSURL *)imageRequest.resource;
     NSURLRequest *URLRequest = [NSURLRequest requestWithURL:URL];
-    DFURLSessionOperation *operation = [[DFURLSessionOperation alloc] initWithRequest:URLRequest];
-    operation.deserializer = [self _responseDeserializerForImageRequest:imageRequest URLRequest:URLRequest];
-    return operation;
-}
-
-- (id<DFURLResponseDeserializing>)_responseDeserializerForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest {
-    if ([self.delegate respondsToSelector:@selector(URLImageFetcher:responseDeserializerForImageRequest:URLRequest:)]) {
-        return [self.delegate URLImageFetcher:self responseDeserializerForImageRequest:imageRequest URLRequest:URLRequest];
-    }
-    if ([URLRequest.URL.scheme hasPrefix:@"http"]) {
-        return [DFURLHTTPImageDeserializer new];
-    } else {
-        return [DFURLImageDeserializer new];
-    }
+    return [[DFURLSessionOperation alloc] initWithRequest:URLRequest];;
 }
 
 #pragma mark - <NSURLSessionDataTaskDelegate>
-
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
-    // Do nothung
-}
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     // Do nothing
@@ -166,12 +144,6 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 #pragma mark - <DFURLSessionOperationDelegate>
 
 - (NSURLSessionDataTask *)URLSessionOperation:(DFURLSessionOperation *)operation dataTaskWithRequest:(NSURLRequest *)request progressHandler:(DFURLSessionProgressHandler)progressHandler completionHandler:(DFURLSessionCompletionHandler)completionHandler {
-    return [self.sessionDelegate URLImageFetcher:self dataTaskWithRequest:request progressHandler:progressHandler completionHandler:completionHandler];
-}
-
-#pragma mark - <DFURLImageFetcherSessionDelegate>
-
-- (NSURLSessionDataTask *)URLImageFetcher:(DFURLImageFetcher *)fetcher dataTaskWithRequest:(NSURLRequest *)request progressHandler:(DFURLSessionProgressHandler)progressHandler completionHandler:(DFURLSessionCompletionHandler)completionHandler {
     NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request];
     return task;
 }
