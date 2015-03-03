@@ -95,16 +95,12 @@
 }
 
 - (NSOperation *)startOperationWithRequest:(DFImageRequest *)request progressHandler:(void (^)(double))progressHandler completion:(void (^)(DFImageResponse *))completion {
-    DFURLSessionOperation *operation = [self _createOperationForImageRequest:request];
+    NSURL *URL = (NSURL *)request.resource;
+    NSURLRequest *URLRequest = [NSURLRequest requestWithURL:URL];
+    DFURLSessionOperation *operation = [[DFURLSessionOperation alloc] initWithRequest:URLRequest];
     operation.delegate = self;
     [_queue addOperation:operation];
     return operation;
-}
-
-- (DFURLSessionOperation *)_createOperationForImageRequest:(DFImageRequest *)imageRequest {
-    NSURL *URL = (NSURL *)imageRequest.resource;
-    NSURLRequest *URLRequest = [NSURLRequest requestWithURL:URL];
-    return [[DFURLSessionOperation alloc] initWithRequest:URLRequest];;
 }
 
 #pragma mark - <NSURLSessionDataTaskDelegate>
