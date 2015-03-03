@@ -23,11 +23,7 @@
 #import "DFImageRequest.h"
 #import "DFImageRequestOptions.h"
 #import "DFImageResponse.h"
-#import "DFURLHTTPImageDeserializer.h"
-#import "DFURLImageDeserializer.h"
 #import "DFURLImageFetcher.h"
-#import "DFURLImageRequestOptions.h"
-#import "DFURLResponseDeserializing.h"
 #import "DFURLSessionOperation.h"
 
 
@@ -44,14 +40,12 @@
         _session = session;
         // We don't need to limit concurrent operations for NSURLSession. For more info see https://github.com/kean/DFImageManager/wiki/Image-Caching-Guide
         _queue = [NSOperationQueue new];
-        
         _supportedSchemes = [NSSet setWithObjects:@"http", @"https", @"ftp", @"file", @"data", nil];
     }
     return self;
 }
 
 - (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration {
-    NSParameterAssert(configuration);
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
     return [self initWithSession:session];
 }
