@@ -122,7 +122,6 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 - (DFImageRequest *)canonicalRequestForRequest:(DFImageRequest *)request {
     if (!request.options || ![request.options isKindOfClass:[DFURLImageRequestOptions class]]) {
         DFURLImageRequestOptions *options = [[DFURLImageRequestOptions alloc] initWithOptions:request.options];
- //       options.cachePolicy = self.session.configuration.requestCachePolicy;
         request.options = options;
     }
     return request;
@@ -131,73 +130,16 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 - (NSOperation *)startOperationWithRequest:(DFImageRequest *)request progressHandler:(void (^)(double))progressHandler completion:(void (^)(DFImageResponse *))completion {
     DFURLSessionOperation *operation = [self _createOperationForImageRequest:request];
     operation.delegate = self;
-    
-    DFURLSessionOperation *__weak weakOp = operation;
-    [operation setProgressHandler:^(int64_t countOfBytesReceived, int64_t countOfBytesExpectedToReceive) {
-        if (progressHandler) {
-            progressHandler((double)countOfBytesReceived / (double)countOfBytesExpectedToReceive);
-        }
-    }];
-    [operation setCompletionBlock:^{
-        DFMutableImageResponse *response = [DFMutableImageResponse new];
-        response.image = weakOp.responseObject;
-        response.error = weakOp.error;
-        NSURLResponse *URLResponse = weakOp.response;
-        if (URLResponse != nil) {
-            response.userInfo = @{ DFImageInfoURLResponseKey : URLResponse };
-        }
-        completion([response copy]);
-    }];
     [_queue addOperation:operation];
     return operation;
 }
 
 - (DFURLSessionOperation *)_createOperationForImageRequest:(DFImageRequest *)imageRequest {
-    NSURLRequest *URLRequest = [self _URLRequestForImageRequest:imageRequest];
+    NSURL *URL = (NSURL *)imageRequest.resource;
+    NSURLRequest *URLRequest = [NSURLRequest requestWithURL:URL];
     DFURLSessionOperation *operation = [self _operationForImageRequest:imageRequest URLRequest:URLRequest];
     operation.deserializer = [self _responseDeserializerForImageRequest:imageRequest URLRequest:URLRequest];
     return operation;
-}
-
-- (NSURLRequest *)_URLRequestForImageRequest:(DFImageRequest *)imageRequest {
-    NSURLRequest *URLRequest = [self _defaultURLRequestForImageRequest:imageRequest];
-    if ([self.delegate respondsToSelector:@selector(URLImageFetcher:URLRequestForImageRequest:URLRequest:)]) {
-        URLRequest = [self.delegate URLImageFetcher:self URLRequestForImageRequest:imageRequest URLRequest:URLRequest];
-    }
-    return URLRequest;
-}
-
-- (NSURLRequest *)_defaultURLRequestForImageRequest:(DFImageRequest *)imageRequest {
-    NSURL *URL = (NSURL *)imageRequest.resource;
-    DFURLImageRequestOptions *options = (id)imageRequest.options;
-    
-    /*! From NSURLSessionConfiguration class reference:
-     "In some cases, the policies defined in this configuration may be overridden by policies specified by an NSURLRequest object provided for a task. Any policy specified on the request object is respected unless the session’s policy is more restrictive. For example, if the session configuration specifies that cellular networking should not be allowed, the NSURLRequest object cannot request cellular networking."
-     
-     Apple doesn't not provide a complete documentation on what NSURLSessionConfiguration options can be overridden by NSURLRequest and in when. So it's best to copy all the options, because the NSURLSession implementation might change in future versons.
-     */
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:URL];
-//    [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
-    
-    /* Set options that can not be configured by DFURLImageRequestOptions.
-     */
-    /*
-   NSURLSessionConfiguration *conf = self.session.configuration;
-    request.timeoutInterval = conf.timeoutIntervalForRequest;
-    request.networkServiceType = conf.networkServiceType;
-    request.allowsCellularAccess = conf.allowsCellularAccess;
-    request.HTTPShouldHandleCookies = conf.HTTPShouldSetCookies;
-    request.HTTPShouldUsePipelining = conf.HTTPShouldUsePipelining;
-     */
-    
-    /* Set options that can be configured by DFURLImageRequestOptions.
-     */
-    request.cachePolicy = options.cachePolicy;
-    if (!options.allowsNetworkAccess) {
-        request.cachePolicy = NSURLRequestReturnCacheDataDontLoad;
-    }
-    
-    return [request copy];
 }
 
 - (DFURLSessionOperation *)_operationForImageRequest:(DFImageRequest *)imageRequest URLRequest:(NSURLRequest *)URLRequest {
@@ -221,27 +163,11 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 #pragma mark - <NSURLSessionDataTaskDelegate>
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
-    @synchronized(self) {
-        _DFURLSessionDataTaskHandler *handler = _sessionTaskHandlers[dataTask];
-        if (handler.progressHandler) {
-        //    handler.progressHandler(dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive);
-        }
-        [handler.data appendData:data];
-    }
+    // Do nothung
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    @synchronized(self) {
-        _DFURLSessionDataTaskHandler *handler = _sessionTaskHandlers[task];
-        if (handler.completionHandler) {
-            handler.completionHandler(handler.data, nil, error);
-        }
-        [_sessionTaskHandlers removeObjectForKey:task];
-    }
-}
-
-- (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error {
-    NSLog(@"error");
+    // Do nothing
 }
 
 #pragma mark - <DFURLSessionOperationDelegate>
@@ -254,14 +180,6 @@ NSString *const DFImageInfoURLResponseKey = @"DFImageInfoURLResponseKey";
 
 - (NSURLSessionDataTask *)URLImageFetcher:(DFURLImageFetcher *)fetcher dataTaskWithRequest:(NSURLRequest *)request progressHandler:(DFURLSessionProgressHandler)progressHandler completionHandler:(DFURLSessionCompletionHandler)completionHandler {
     NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request];
-    return task;
-    
-    @synchronized(self) {
-            task = [self.session dataTaskWithRequest:request];
-            if (task) {
-            _sessionTaskHandlers[task] = [[_DFURLSessionDataTaskHandler alloc] initWithProgressHandler:progressHandler completion:completionHandler];
-        }
-    }
     return task;
 }
 
