@@ -23,10 +23,35 @@
 #import "DFURLImageDeserializer.h"
 #import <UIKit/UIKit.h>
 
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#import <FLAnimatedImage.h>
+#import "DFAnimatedImage.h"
+#endif
+
+
 @implementation DFURLImageDeserializer
 
 - (id)objectFromResponse:(NSURLResponse *)response data:(NSData *)data error:(NSError *__autoreleasing *)error {
+    if (!data.length) {
+        return nil;
+    }
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+    if ([self _isGIF:data]) {
+        UIImage *image = [[DFAnimatedImage alloc] initWithAnimatedGIFData:data];
+        if (image) {
+            return image;
+        }
+    }
+#endif
     return [[UIImage alloc] initWithData:data scale:[UIScreen mainScreen].scale];
+}
+
+/*! Based on http://en.wikipedia.org/wiki/Magic_number_(programming)
+ */
+- (BOOL)_isGIF:(NSData *)data {
+    uint8_t c;
+    [data getBytes:&c length:1];
+    return c == 0x47;
 }
 
 @end

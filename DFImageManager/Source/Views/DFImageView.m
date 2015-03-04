@@ -28,6 +28,10 @@
 #import "DFImageView.h"
 #import "DFNetworkReachability.h"
 
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#import "DFAnimatedImage.h"
+#endif
+
 
 static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
 
@@ -65,11 +69,28 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
     _allowsAnimations = YES;
     _allowsAutoRetries = YES;
     _managesRequestPriorities = NO;
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+    _allowsGIFPlayback = YES;
+#endif
     _imageRequestOptions = [DFImageRequestOptions new];
     
     self.delegate = self;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_reachabilityDidChange:) name:DFNetworkReachabilityDidChangeNotification object:[DFNetworkReachability shared]];
+}
+
+- (void)setImage:(UIImage *)image {
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+    if (!image) {
+        self.animatedImage = nil;
+    }
+    if (self.allowsGIFPlayback && [image isKindOfClass:[DFAnimatedImage class]]) {
+        DFAnimatedImage *animatedImage = (DFAnimatedImage *)image;
+        self.animatedImage = animatedImage.animatedImage;
+        return;
+    }
+#endif
+    super.image = image;
 }
 
 #pragma mark -

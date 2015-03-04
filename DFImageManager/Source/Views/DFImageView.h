@@ -88,6 +88,12 @@
  */
 @property (nonatomic) BOOL allowsAutoRetries;
 
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+/*! Default value is YES.
+ */
+@property (nonatomic) BOOL allowsGIFPlayback;
+#endif
+
 /*! Image view delegate. By default delegate is set to the image view itself. The implementation displays fetched images with animation when necessary.
  */
 @property (nonatomic, weak) id<DFImageViewDelegate> delegate;
