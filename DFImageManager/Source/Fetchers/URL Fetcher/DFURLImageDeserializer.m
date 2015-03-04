@@ -23,7 +23,7 @@
 #import "DFURLImageDeserializer.h"
 #import <UIKit/UIKit.h>
 
-#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#if __has_include("DFAnimatedImage.h")
 #import <FLAnimatedImage.h>
 #import "DFAnimatedImage.h"
 #endif
@@ -35,7 +35,7 @@
     if (!data.length) {
         return nil;
     }
-#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#if __has_include("DFAnimatedImage.h")
     if ([self _isGIF:data]) {
         UIImage *image = [[DFAnimatedImage alloc] initWithAnimatedGIFData:data];
         if (image) {

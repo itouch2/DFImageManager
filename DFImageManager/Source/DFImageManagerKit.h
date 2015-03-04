@@ -84,7 +84,7 @@
 #import "DFNetworkReachability.h"
 
 // GIF
-#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#if __has_include("DFAnimatedImage.h")
 #import "DFAnimatedImage.h"
 #endif
 

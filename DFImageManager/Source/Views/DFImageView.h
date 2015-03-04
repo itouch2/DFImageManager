@@ -23,7 +23,7 @@
 #import "DFImageManaging.h"
 #import <UIKit/UIKit.h>
 
-#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#if __has_include("DFAnimatedImage.h")
 #import <FLAnimatedImage.h>
 #endif
 
@@ -53,7 +53,7 @@
 
 /*! An image view extends UIImageView class with image fetching functionality. It also adds other features like managing request priorities, retrying failed requests and more.
  */
-#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#if __has_include("DFAnimatedImage.h")
 @interface DFImageView : FLAnimatedImageView <DFImageViewDelegate>
 #else
 @interface DFImageView : UIImageView <DFImageViewDelegate>
@@ -88,7 +88,7 @@
  */
 @property (nonatomic) BOOL allowsAutoRetries;
 
-#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#if __has_include("DFAnimatedImage.h")
 /*! Default value is YES.
  */
 @property (nonatomic) BOOL allowsGIFPlayback;
