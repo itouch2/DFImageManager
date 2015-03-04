@@ -5,5 +5,3 @@ workspace "DFImageManager.xcworkspace"
 link_with "DFImageManagerTests"
 
 source "https://github.com/CocoaPods/Specs.git"
-
-pod "OHHTTPStubs"
