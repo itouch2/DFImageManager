@@ -82,3 +82,9 @@
 #import "DFImageUtilities.h"
 #import "DFImageManagerBlockValueTransformer.h"
 #import "DFNetworkReachability.h"
+
+// GIF
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#import "DFAnimatedImage.h"
+#endif
+
