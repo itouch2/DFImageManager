@@ -12,14 +12,14 @@ Pod::Spec.new do |s|
     s.requires_arc = true
 
     s.subspec "Core" do |ss|
-        s.source_files  = "DFImageManager/Source/**/*.{h,m}"
-        s.exclude_files = "DFImageManager/Source/GIF/**/*.{h,m}"
+        ss.source_files  = "DFImageManager/Source/**/*.{h,m}"
+        ss.exclude_files = "DFImageManager/Source/GIF/**/*.{h,m}"
     end
 
     s.subspec "GIF" do |ss|
-        s.source_files = "DFImageManager/Source/GIF/**/*.{h,m}"
         ss.dependency "DFImageManager/Core"
         ss.dependency "FLAnimatedImage", "~> 1.0"
+        ss.source_files = "DFImageManager/Source/GIF/**/*.{h,m}"
     end
 
 end
