@@ -23,10 +23,15 @@
 #import "DFImageManaging.h"
 #import <UIKit/UIKit.h>
 
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+#import <FLAnimatedImage.h>
+#endif
+
 @class DFCompositeImageFetchOperation;
 @class DFImageRequest;
 @class DFImageRequestOptions;
 @class DFImageView;
+
 
 
 /*! A class conforming to the DFImageViewDelegate protocol provides method for displaying fetched images and reacting to failures.
@@ -48,7 +53,11 @@
 
 /*! An image view extends UIImageView class with image fetching functionality. It also adds other features like managing request priorities, retrying failed requests and more.
  */
+#ifdef COCOAPODS_POD_AVAILABLE_DFImageManager_GIF
+@interface DFImageView : FLAnimatedImageView <DFImageViewDelegate>
+#else
 @interface DFImageView : UIImageView <DFImageViewDelegate>
+#endif
 
 /*! Image manager used by the image view. Set to the shared manager during initialization.
  */
