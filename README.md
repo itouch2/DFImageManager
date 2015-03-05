@@ -173,12 +173,6 @@ platform :ios, '7.0'
 pod 'DFImageManager'
 ```
 
-If you want to use the latest `DFImageManager` features before the new version is released, you can specify the `:head` flag in you podfile.
-```ruby
-platform :ios, '7.0'
-pod 'DFImageManager', :head
-```
-
 ## Contribution
  
 - If you **need help**, use [Stack Overflow](http://stackoverflow.com/questions/tagged/dfimagemanager). (Tag 'dfimagemanager')
