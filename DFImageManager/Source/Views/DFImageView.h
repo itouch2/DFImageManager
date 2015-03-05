@@ -51,11 +51,14 @@
 @end
 
 
-/*! An image view extends UIImageView class with image fetching functionality. It also adds other features like managing request priorities, retrying failed requests and more.
- */
 #if __has_include("DFAnimatedImage.h")
+/*! An image view extends UIImageView class with image fetching functionality. It also adds other features like managing request priorities, retrying failed requests and more.
+ @note The DFImageView is a FLAnimatedImageView subclass that support animated GIF playback. The playback is enabled by default and can be disabled using allowsGIFPlayback property.
+ */
 @interface DFImageView : FLAnimatedImageView <DFImageViewDelegate>
 #else
+/*! An image view extends UIImageView class with image fetching functionality. It also adds other features like managing request priorities, retrying failed requests and more.
+ */
 @interface DFImageView : UIImageView <DFImageViewDelegate>
 #endif
 
