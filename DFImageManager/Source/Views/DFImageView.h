@@ -89,7 +89,7 @@
 @property (nonatomic) BOOL allowsAutoRetries;
 
 #if __has_include("DFAnimatedImage.h")
-/*! Default value is YES.
+/*! If the value is YES the receiver will start a GIF playback as soon as the image is displayed. Default value is YES.
  */
 @property (nonatomic) BOOL allowsGIFPlayback;
 #endif
