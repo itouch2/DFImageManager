@@ -41,24 +41,24 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self _cancelFetching];
+    [self _df_cancelFetching];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
-        [self _commonInit];
+        [self _df_commonInit];
     }
     return self;
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        [self _commonInit];
+        [self _df_commonInit];
     }
     return self;
 }
 
-- (void)_commonInit {
+- (void)_df_commonInit {
     self.contentMode = UIViewContentModeScaleAspectFill;
     self.clipsToBounds = YES;
     
@@ -79,7 +79,7 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_reachabilityDidChange:) name:DFNetworkReachabilityDidChangeNotification object:[DFNetworkReachability shared]];
 }
 
-- (void)setImage:(UIImage *)image {
+- (void)displayImage:(UIImage *)image {
 #if __has_include("DFAnimatedImage.h")
     if (!image) {
         self.animatedImage = nil;
@@ -90,20 +90,23 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
         return;
     }
 #endif
-    super.image = image;
+    self.image = image;
 }
 
 #pragma mark -
 
 - (void)prepareForReuse {
-    [self _cancelFetching];
+    [self _df_cancelFetching];
     _operation = nil;
     _previousAutoretryTime = 0.0;
     self.image = nil;
+#if __has_include("DFAnimatedImage.h")
+    self.animatedImage = nil;
+#endif
     [self.layer removeAllAnimations];
 }
 
-- (void)_cancelFetching {
+- (void)_df_cancelFetching {
     [_operation cancel];
 }
 
@@ -133,7 +136,7 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
 }
 
 - (void)setImageWithRequests:(NSArray *)requests {
-    [self _cancelFetching];
+    [self _df_cancelFetching];
     
     if ([self.delegate respondsToSelector:@selector(imageView:willStartFetchingImagesForRequests:)]) {
         [self.delegate imageView:self willStartFetchingImagesForRequests:requests];
@@ -173,7 +176,7 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
 - (void)imageView:(DFImageView *)imageView didCompleteRequest:(DFImageRequest *)request withImage:(UIImage *)image info:(NSDictionary *)info {
     BOOL isFastResponse = (_operation.elapsedTime * 1000.0) < 64.f; // Elapsed time is lower then 64 ms, if we miss 4 frames, that's good enough
     if (self.allowsAnimations && !isFastResponse && !self.image) {
-        self.image = image;
+        [self displayImage:image];
         [self.layer addAnimation:({
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
             animation.keyPath = @"opacity";
@@ -183,7 +186,7 @@ static const NSTimeInterval _kMinimumAutoretryInterval = 8.f;
             animation;
         }) forKey:@"opacity"];
     } else {
-        self.image = image;
+        [self displayImage:image];
     }
 }
 

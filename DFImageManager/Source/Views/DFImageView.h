@@ -66,6 +66,10 @@
  */
 @property (nonatomic) id<DFImageManagingCore> imageManager;
 
+/*! Image view delegate. By default delegate is set to the image view itself. The implementation displays fetched images with animation when necessary.
+ */
+@property (nonatomic, weak) id<DFImageViewDelegate> delegate;
+
 /*! Image target size  used for image requests when target size is not present in -setImageWith... method that was called.. Returns current view pixel size when the value is CGSizeZero.
  */
 @property (nonatomic) CGSize imageTargetSize;
@@ -95,17 +99,19 @@
 /*! If the value is YES the receiver will start a GIF playback as soon as the image is displayed. Default value is YES.
  */
 @property (nonatomic) BOOL allowsGIFPlayback;
+
 #endif
 
-/*! Image view delegate. By default delegate is set to the image view itself. The implementation displays fetched images with animation when necessary.
+/*! Displayes a given image. Automatically starts GIF playback when given a DFAnimatedImage object and when the GIF playback is enabled. The 'GIF' subspec should be installed to enable this feature.
+ @note This method is always included in compilation even if the The 'GIF' subspec is not installed.
  */
-@property (nonatomic, weak) id<DFImageViewDelegate> delegate;
+- (void)displayImage:(UIImage *)image;
 
 /*! Performs any clean up necessary to prepare the view for use again. Removes currently displayed image and cancels all requests registered with a receiver.
  */
 - (void)prepareForReuse;
 
-/*! Returns current composite image fetch operation.
+/*! Returns current composite image fetch operation. The operation stores a lot of information about the running and completed requests that can be retrieved at any time.
  */
 @property (nonatomic, readonly) DFCompositeImageFetchOperation *operation;
 
